@@ -32,7 +32,7 @@ draw.rectangle((0, 0, OLED_WIDTH,OLED_HEIGHT), outline=0, fill=0)
 
 FONT_SIZE = 6
 
-font = ImageFont.truetype('tiny.ttf', FONT_SIZE)
+font = ImageFont.truetype('/home/username/oled-terminal-pyte/tiny.ttf', FONT_SIZE)
 
 CHARS_HEIGHT = 10
 CHARS_WIDTH = 32

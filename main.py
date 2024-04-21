@@ -19,9 +19,14 @@ class Terminal:
         #spawn shell
         child_pid, self.fd = pty.fork()
         if child_pid == 0:  # Child.
+            os.chdir("/home/username")
             argv = shlex.split("bash")
-            env = dict(TERM="linux", LC_ALL="en_GB.UTF-8",
-            COLUMNS=str(oled.CHARS_WIDTH), LINES=str(oled.CHARS_HEIGHT))
+            env = {
+                "TERM": "xterm",
+                "LC_ALL": "en_GB.UTF-8",
+                "COLUMNS": str(oled.CHARS_WIDTH),
+                "LINES": str(oled.CHARS_HEIGHT),
+            }
             os.execvpe(argv[0], argv, env)
             
         #create pyte object
@@ -35,9 +40,10 @@ class Terminal:
         
         spec_keys = {
             'enter': '\r',
+            'tab': '\t',
             'esc': '\x1b',
-            'home': '\x1b[H',
-            'end': '\x1b[F',
+            'home': '\x1b[1~',
+            'end': '\x1b[4~',
             'backspace': '\x7f',
             'delete': '\x1b[3~',
             'space': ' ',
@@ -58,10 +64,10 @@ class Terminal:
                 return
             
             elif key == 'page_down':
-                screen.next_page()
+                self.screen.next_page()
                 oled.update_screen(self.screen.display, self.screen.cursor.x, self.screen.cursor.y)
             elif key == 'page_up':
-                screen.prev_page()
+                self.screen.prev_page()
                 oled.update_screen(self.screen.display, self.screen.cursor.x, self.screen.cursor.y)
 
             elif len(key) == 1:
@@ -72,7 +78,7 @@ class Terminal:
                 if 'shift_r' in currently_pressed:
                     currently_pressed.remove('shift_r')
                 if 'ctrl' in currently_pressed:
-                    os.write(fd, chr(ord(key)-96).encode())
+                    os.write(self.fd, chr(ord(key)-96).encode())
                     
                 for k in currently_pressed:
                     if len(k) > 1:
