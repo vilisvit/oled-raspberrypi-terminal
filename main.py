@@ -14,7 +14,7 @@ class Terminal:
     
     def __init__(self):
 
-        max_read_bytes=1024 * 20
+        self.max_read_bytes=1024 * 20
 
         #spawn shell
         child_pid, self.fd = pty.fork()
@@ -107,26 +107,18 @@ class Terminal:
         return input_text
 
     def read_and_forward_pty_output(self):
-        max_read_bytes = 1024 * 20
-        global lines
-        iteration = 0
         while True:
             if self.fd:
                 timeout_sec = 0
                 (data_ready, _, _) = select.select([self.fd], [], [], timeout_sec)
                 if data_ready:
-                    output = os.read(self.fd, max_read_bytes).decode(errors="ignore")
+                    output = os.read(self.fd, self.max_read_bytes).decode(errors="ignore")
                     
                     self.stream.feed(output)
                     
                     oled.update_screen(self.screen.display, self.screen.cursor.x, self.screen.cursor.y)
 
     def run_shell(self):
-        global lines
-
-        # Define the commands
-        command = ""
-
         output_thread = Thread(target=self.read_and_forward_pty_output)
         output_thread.start()
 
